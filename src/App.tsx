@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import SensorCard from "./components/SensorCard";
-import AlertDisplay from "./components/AlertDisplay";
+//import AlertDisplay from "./components/AlertDisplay";
 import Tabs from "./components/tabs";
 import HistorialGrafico from "./components/HistorialGrafico";
 import RiskIndicator from "./components/RiskIndicator";
