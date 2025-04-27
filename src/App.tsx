@@ -1,15 +1,19 @@
 import { useEffect, useState, useRef } from "react";
 import SensorCard from "./components/SensorCard";
-//import AlertDisplay from "./components/AlertDisplay";
+import AlertDisplay from "./components/AlertDisplay";
 import Tabs from "./components/tabs";
 import HistorialGrafico from "./components/HistorialGrafico";
 import RiskIndicator from "./components/RiskIndicator";
 
-// Tipo para los datos del sensor adaptados
+// URL real del backend desplegado en Fly.io
+const BACKEND_URL = 'https://backend-iot2-divine-cloud-2666.fly.dev';
+
+// Tipo de datos de sensores
 interface SensorData {
   temperatura: number;
   gas: number;
   llama: boolean;
+  humo: boolean;
   timestamp: string;
 }
 
@@ -18,6 +22,7 @@ function App() {
     temperatura: 0,
     gas: 0,
     llama: false,
+    humo: false,
     timestamp: new Date().toISOString(),
   });
 
@@ -34,7 +39,7 @@ function App() {
   const historialRef = useRef<SensorData[]>([]);
 
   const actualizarHistorial = () => {
-    fetch('/api/sensors/20')
+    fetch(`${BACKEND_URL}/sensors/20`)
       .then(res => res.json())
       .then((lista: { CreatedAt: string; Temperature: number; Gas: number; Flame: boolean }[]) => {
         const historicoAdaptado = lista.map(item => ({
@@ -54,14 +59,14 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch('/api/sensor')
+      fetch(`${BACKEND_URL}/sensor`)
         .then(res => res.json())
         .then((nuevoDato: { CreatedAt: string; Temperature: number; Gas: number; Flame: boolean }) => {
           const sensorData: SensorData = {
             temperatura: nuevoDato.Temperature,
             gas: nuevoDato.Gas,
             llama: nuevoDato.Flame,
-            //humo: nuevoDato.Gas > 300,
+            humo: nuevoDato.Gas > 300,
             timestamp: nuevoDato.CreatedAt,
           };
 
@@ -72,7 +77,7 @@ function App() {
           console.error('Error al obtener datos del sensor:', error);
         });
 
-      fetch('/api/risk')
+      fetch(`${BACKEND_URL}/risk`)
         .then(res => res.json())
         .then((riskData: { CreatedAt: string; Risk: number }) => {
           setRiskLevel(riskData.Risk);
@@ -99,7 +104,7 @@ function App() {
   }, []);
 
   const guardarConfiguracion = () => {
-    fetch('/api/config', {
+    fetch(`${BACKEND_URL}/config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -125,7 +130,7 @@ function App() {
   };
 
   const apagarAlarmaDesdeBackend = () => {
-    fetch('/api/config', {
+    fetch(`${BACKEND_URL}/config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -162,18 +167,17 @@ function App() {
         <Tabs labels={["Sensores en tiempo real", "Historial y gráfico"]}>
           {/* Tab 1: Sensores en tiempo real */}
           <>
-            
+            <AlertDisplay risk={riskLevel} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <SensorCard title="Temperatura" value={data.temperatura} unit="°C" isDanger={data.temperatura > tempTreshold} />
               <SensorCard title="Gas" value={data.gas} unit="ppm" isDanger={data.gas > gasTreshold} />
               <SensorCard title="Llama" value={data.llama ? "Sí" : "No"} unit="" isDanger={data.llama} />
+              <SensorCard title="Humo" value={data.humo ? "Sí" : "No"} unit="" isDanger={data.humo} />
             </div>
 
             {/* Sección de Alarma y Configuración */}
             <div className="mt-10 flex flex-col items-center gap-6">
-
-              {/* Estado de Alarma */}
               <div
                 className={`px-6 py-3 rounded-xl text-lg font-semibold ${
                   alarmaActiva ? "bg-red-600 text-white" : "bg-green-600 text-white"
@@ -182,17 +186,15 @@ function App() {
                 {alarmaActiva ? "ALARMA ACTIVADA" : "ALARMA APAGADA"}
               </div>
 
-              {/* Botón Apagar Alarma */}
               {alarmaActiva && (
                 <button
                   className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 shadow-lg"
-                  onClick={() => apagarAlarmaDesdeBackend()}
+                  onClick={apagarAlarmaDesdeBackend}
                 >
                   Apagar Alarma
                 </button>
               )}
 
-              {/* Formulario de Configuración */}
               <div className="w-full max-w-lg bg-gray-800 p-6 rounded-lg shadow-md mt-10">
                 <h2 className="text-2xl font-bold mb-6 text-center">Configuración de Límites</h2>
 
@@ -282,7 +284,7 @@ function App() {
                       <td className="p-3">{item.temperatura}</td>
                       <td className="p-3">{item.gas}</td>
                       <td className="p-3">{item.llama ? "Sí" : "No"}</td>
-                     
+                      <td className="p-3">{item.humo ? "Sí" : "No"}</td>
                     </tr>
                   ))}
                 </tbody>
