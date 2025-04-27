@@ -5,8 +5,8 @@ import Tabs from "./components/tabs";
 import HistorialGrafico from "./components/HistorialGrafico";
 import RiskIndicator from "./components/RiskIndicator";
 
-// URL real del backend desplegado en Fly.io
-const BACKEND_URL = 'https://backend-iot2-divine-cloud-2666.fly.dev';
+// Ahora usando CORS Proxy para evitar el error de CORS
+const BACKEND_URL = 'https://corsproxy.io/?https://backend-iot2-divine-cloud-2666.fly.dev';
 
 // Tipo de datos de sensores
 interface SensorData {
@@ -165,7 +165,6 @@ function App() {
         <RiskIndicator risk={riskLevel} />
 
         <Tabs labels={["Sensores en tiempo real", "Historial y gráfico"]}>
-          {/* Tab 1: Sensores en tiempo real */}
           <>
             <AlertDisplay risk={riskLevel} />
 
@@ -176,7 +175,6 @@ function App() {
               <SensorCard title="Humo" value={data.humo ? "Sí" : "No"} unit="" isDanger={data.humo} />
             </div>
 
-            {/* Sección de Alarma y Configuración */}
             <div className="mt-10 flex flex-col items-center gap-6">
               <div
                 className={`px-6 py-3 rounded-xl text-lg font-semibold ${
@@ -250,8 +248,6 @@ function App() {
               </div>
             </div>
           </>
-
-          {/* Tab 2: Historial y gráfica */}
           <>
             <div className="mb-4">
               <button
