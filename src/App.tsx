@@ -10,8 +10,9 @@ const BACKEND_URL = 'https://backend-iot2-divine-cloud-2666.fly.dev';
 
 // proxyFetch ahora acepta url y options
 const proxyFetch = (url: string, options?: RequestInit) => {
-  return fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, options);
+  return fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, options);
 };
+
 
 // Tipo de datos de sensores
 interface SensorData {
