@@ -166,8 +166,7 @@ function App() {
 
         <Tabs labels={["Sensores en tiempo real", "Historial y gráfico"]}>
           <>
-            <AlertDisplay risk={riskLevel} />
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <SensorCard title="Temperatura" value={data.temperatura} unit="°C" isDanger={data.temperatura > tempTreshold} />
               <SensorCard title="Gas" value={data.gas} unit="ppm" isDanger={data.gas > gasTreshold} />
