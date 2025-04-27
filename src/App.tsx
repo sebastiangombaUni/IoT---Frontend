@@ -5,14 +5,8 @@ import Tabs from "./components/tabs";
 import HistorialGrafico from "./components/HistorialGrafico";
 import RiskIndicator from "./components/RiskIndicator";
 
-// URL real del backend (sin el proxy en esta constante)
+// URL limpia del backend
 const BACKEND_URL = 'https://backend-iot2-divine-cloud-2666.fly.dev';
-
-// proxyFetch ahora acepta url y options
-const proxyFetch = (url: string, options?: RequestInit) => {
-  return fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, options);
-};
-
 
 // Tipo de datos de sensores
 interface SensorData {
@@ -45,7 +39,7 @@ function App() {
   const historialRef = useRef<SensorData[]>([]);
 
   const actualizarHistorial = () => {
-    proxyFetch(`${BACKEND_URL}/sensors/20`)
+    fetch(`${BACKEND_URL}/sensors/20`)
       .then(res => res.json())
       .then((lista: { CreatedAt: string; Temperature: number; Gas: number; Flame: boolean }[]) => {
         const historicoAdaptado = lista.map(item => ({
@@ -65,7 +59,7 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      proxyFetch(`${BACKEND_URL}/sensor`)
+      fetch(`${BACKEND_URL}/sensor`)
         .then(res => res.json())
         .then((nuevoDato: { CreatedAt: string; Temperature: number; Gas: number; Flame: boolean }) => {
           const sensorData: SensorData = {
@@ -83,7 +77,7 @@ function App() {
           console.error('Error al obtener datos del sensor:', error);
         });
 
-      proxyFetch(`${BACKEND_URL}/risk`)
+      fetch(`${BACKEND_URL}/risk`)
         .then(res => res.json())
         .then((riskData: { CreatedAt: string; Risk: number }) => {
           setRiskLevel(riskData.Risk);
@@ -110,7 +104,7 @@ function App() {
   }, []);
 
   const guardarConfiguracion = () => {
-    proxyFetch(`${BACKEND_URL}/config`, {
+    fetch(`${BACKEND_URL}/config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,7 +130,7 @@ function App() {
   };
 
   const apagarAlarmaDesdeBackend = () => {
-    proxyFetch(`${BACKEND_URL}/config`, {
+    fetch(`${BACKEND_URL}/config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -199,7 +193,6 @@ function App() {
                 </button>
               )}
 
-              {/* Formulario de configuración */}
               <div className="w-full max-w-lg bg-gray-800 p-6 rounded-lg shadow-md mt-10">
                 <h2 className="text-2xl font-bold mb-6 text-center">Configuración de Límites</h2>
 
